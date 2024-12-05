@@ -75,22 +75,63 @@ def replace_latest_data(connection, data):
             """
 
             # Insert new data
-            for entry in data:
-                cursor.execute(insert_query, (
-                    entry['dam_id'],
-                    entry['dam_name'],
-                    entry['date'],
-                    entry['storage_volume'],
-                    entry['percentage_full'],
-                    entry['storage_inflow'],
-                    entry['storage_release']
-                ))
+            for record in data:
+                dams = record.get('dams', [])
+                for dam in dams:
+                    for resource in dam.get('resources', []):
+                        cursor.execute(insert_query, (
+                            dam['dam_id'],
+                            dam['dam_name'],
+                            resource['date'],
+                            resource['storage_volume'],
+                            resource['percentage_full'],
+                            resource['storage_inflow'],
+                            resource['storage_release']
+                        ))
 
             # Commit changes
             connection.commit()
-            logger.info(f"Inserted {len(data)} entries into the 'latest_data' table.")
+            logger.info("Successfully replaced data in the 'latest_data' table.")
     except Exception as e:
         logger.error(f"Failed to replace data in the 'latest_data' table. Exception: {e}")
+        raise
+
+def insert_into_dam_resources(connection, data):
+    """
+    Insert data into the 'dam_resources' table without affecting existing records.
+    """
+    try:
+        with connection.cursor() as cursor:
+            # Prepare insert query
+            insert_query = """
+                INSERT INTO dam_resources (dam_id, date, storage_volume, percentage_full, storage_inflow, storage_release)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE
+                storage_volume = VALUES(storage_volume),
+                percentage_full = VALUES(percentage_full),
+                storage_inflow = VALUES(storage_inflow),
+                storage_release = VALUES(storage_release)
+            """
+
+            # Iterate through each record in the data
+            for record in data:
+                dams = record.get('dams', [])
+                for dam in dams:
+                    for resource in dam.get('resources', []):
+                        cursor.execute(insert_query, (
+                            dam['dam_id'],
+                            resource['date'],
+                            resource['storage_volume'],
+                            resource['percentage_full'],
+                            resource['storage_inflow'],
+                            resource['storage_release']
+                        ))
+
+            # Commit changes
+            connection.commit()
+            logger.info("Successfully inserted data into the 'dam_resources' table.")
+    except Exception as e:
+        logger.error(f"Failed to insert data into the 'dam_resources' table. Exception: {e}")
         raise
 
 def lambda_handler(event, context):
@@ -130,6 +171,9 @@ def lambda_handler(event, context):
             try:
                 # Replace latest_data table content
                 replace_latest_data(connection, data)
+
+                # Insert data into dam_resources table
+                insert_into_dam_resources(connection, data)
             finally:
                 connection.close()
                 logger.info("RDS connection closed.")
@@ -144,5 +188,5 @@ def lambda_handler(event, context):
     logger.info(f"S3 bucket '{bucket_name}' has been successfully updated. Lambda function triggered as a result.")
     return {
         "statusCode": 200,
-        "body": f"S3 bucket '{bucket_name}' has been successfully updated. Data replaced in 'latest_data' table."
+        "body": f"S3 bucket '{bucket_name}' has been successfully updated. Data replaced in 'latest_data' table and added to 'dam_resources' table."
     }

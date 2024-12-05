@@ -54,3 +54,8 @@ pip install requests -t lambda_test_request/
 # List S3 Bucket Contents
 
 python scripts/list_s3_contents.py
+
+
+# Verify Database Updates
+
+python scripts/verify_database_updates.py
