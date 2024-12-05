@@ -134,6 +134,18 @@ def insert_into_dam_resources(connection, data):
         logger.error(f"Failed to insert data into the 'dam_resources' table. Exception: {e}")
         raise
 
+def start_glue_job(job_name):
+    """
+    Start an AWS Glue job by name.
+    """
+    glue_client = boto3.client('glue')
+    try:
+        response = glue_client.start_job_run(JobName=job_name)
+        logger.info(f"Started Glue job '{job_name}'. Job run ID: {response['JobRunId']}")
+    except Exception as e:
+        logger.error(f"Failed to start Glue job '{job_name}'. Exception: {e}")
+        raise
+
 def lambda_handler(event, context):
     """
     AWS Lambda handler function triggered by S3 events.
@@ -177,6 +189,13 @@ def lambda_handler(event, context):
             finally:
                 connection.close()
                 logger.info("RDS connection closed.")
+
+            # Start the Glue job after data has been written to RDS
+            glue_job_name = os.getenv('GLUE_JOB_NAME', 'latest_dam_data_etl')  # Default to 'latest_dam_data_etl'
+            if glue_job_name:
+                start_glue_job(glue_job_name)
+            else:
+                logger.error("GLUE_JOB_NAME environment variable is not set. Cannot start Glue job.")
 
     except Exception as e:
         logger.error(f"Unhandled exception in Lambda: {e}")

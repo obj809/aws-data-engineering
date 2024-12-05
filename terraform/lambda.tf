@@ -8,7 +8,6 @@ resource "aws_lambda_function" "lambda_trigger" {
   filename         = "${path.module}/../zipped_lambda_functions/lambda_trigger.zip"
   source_code_hash = filebase64sha256("${path.module}/../zipped_lambda_functions/lambda_trigger.zip")
 
-  # Add the timeout parameter (optional)
   timeout = 60
 
   environment {
@@ -32,7 +31,6 @@ resource "aws_lambda_function" "lambda_test_request" {
   filename         = "${path.module}/../zipped_lambda_functions/lambda_test_request.zip"
   source_code_hash = filebase64sha256("${path.module}/../zipped_lambda_functions/lambda_test_request.zip")
 
-  # Add the timeout parameter (optional)
   timeout = 60
 
   environment {
@@ -54,7 +52,6 @@ resource "aws_lambda_function" "lambda_data_collection" {
   filename         = "${path.module}/../zipped_lambda_functions/lambda_data_collection.zip"
   source_code_hash = filebase64sha256("${path.module}/../zipped_lambda_functions/lambda_data_collection.zip")
 
-  # Add the timeout parameter
   timeout = 60
 
   environment {
@@ -67,7 +64,7 @@ resource "aws_lambda_function" "lambda_data_collection" {
       DB_NAME           = var.DB_NAME
       DB_USER           = var.DB_USER
       DB_PASSWORD       = var.DB_PASSWORD
-      S3_BUCKET_NAME    = aws_s3_bucket.latest_dam_data_storage.bucket  # Updated S3 bucket name
+      S3_BUCKET_NAME    = aws_s3_bucket.latest_dam_data_storage.bucket
     }
   }
 
@@ -84,7 +81,6 @@ resource "aws_lambda_function" "lambda_db_connection" {
   filename         = "${path.module}/../zipped_lambda_functions/lambda_db_connection.zip"
   source_code_hash = filebase64sha256("${path.module}/../zipped_lambda_functions/lambda_db_connection.zip")
 
-  # Add the timeout parameter
   timeout = 60
 
   environment {
@@ -94,7 +90,6 @@ resource "aws_lambda_function" "lambda_db_connection" {
       DB_NAME     = var.DB_NAME
       DB_USER     = var.DB_USER
       DB_PASSWORD = var.DB_PASSWORD
-      # Add any additional environment variables if needed
     }
   }
 
@@ -111,7 +106,6 @@ resource "aws_lambda_function" "lambda_load_rds_glue" {
   filename         = "${path.module}/../zipped_lambda_functions/lambda_load_rds_glue.zip"
   source_code_hash = filebase64sha256("${path.module}/../zipped_lambda_functions/lambda_load_rds_glue.zip")
 
-  # Add the timeout parameter
   timeout = 60
 
   environment {
@@ -122,6 +116,7 @@ resource "aws_lambda_function" "lambda_load_rds_glue" {
       DB_NAME           = var.DB_NAME
       DB_USER           = var.DB_USER
       DB_PASSWORD       = var.DB_PASSWORD
+      GLUE_JOB_NAME     = aws_glue_job.latest_dam_data_etl.name  # Added environment variable
     }
   }
 
