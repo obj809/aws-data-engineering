@@ -1,0 +1,24 @@
+
+.env
+venv
+.secret-commands.md
+
+
+# Ignore Terraform provider binaries and cache files
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/terraform.tfvars
+terraform/.terraform.lock.hcl
+
+# Ignore Terraform plan output files
+terraform/*.tfplan
+
+# Ignore crash logs and overrides
+terraform/*.crash
+terraform/override.tf
+terraform/override.tf.json
+terraform/*_override.tf
+terraform/*_override.tf.json
+
+terraform/terraform.tfvars
