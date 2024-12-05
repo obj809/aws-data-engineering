@@ -3,7 +3,7 @@
 variable "AWS_REGION" {
   type        = string
   description = "The AWS region to deploy resources"
-  default     = "ap-southeast-2"  # Update as needed
+  default     = "ap-southeast-2"
 }
 
 variable "AWS_ACCOUNT_ID" {

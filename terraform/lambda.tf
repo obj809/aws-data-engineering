@@ -9,7 +9,7 @@ resource "aws_lambda_function" "lambda_trigger" {
   source_code_hash = filebase64sha256("${path.module}/../zipped_lambda_functions/lambda_trigger.zip")
 
   # Add the timeout parameter (optional)
-  # timeout          = 60  # Timeout in seconds
+  timeout = 60
 
   environment {
     variables = {
@@ -33,7 +33,7 @@ resource "aws_lambda_function" "lambda_test_request" {
   source_code_hash = filebase64sha256("${path.module}/../zipped_lambda_functions/lambda_test_request.zip")
 
   # Add the timeout parameter (optional)
-  # timeout          = 60  # Timeout in seconds
+  timeout = 60
 
   environment {
     variables = {
@@ -54,8 +54,8 @@ resource "aws_lambda_function" "lambda_data_collection" {
   filename         = "${path.module}/../zipped_lambda_functions/lambda_data_collection.zip"
   source_code_hash = filebase64sha256("${path.module}/../zipped_lambda_functions/lambda_data_collection.zip")
 
-  # Add the timeout parameter here
-  timeout = 60  # Timeout in seconds
+  # Add the timeout parameter
+  timeout = 60
 
   environment {
     variables = {
@@ -76,7 +76,6 @@ resource "aws_lambda_function" "lambda_data_collection" {
   }
 }
 
-# Existing Lambda Function: lambda_db_connection
 resource "aws_lambda_function" "lambda_db_connection" {
   function_name    = "lambda_db_connection"
   role             = aws_iam_role.lambda_execution_role.arn
@@ -85,8 +84,8 @@ resource "aws_lambda_function" "lambda_db_connection" {
   filename         = "${path.module}/../zipped_lambda_functions/lambda_db_connection.zip"
   source_code_hash = filebase64sha256("${path.module}/../zipped_lambda_functions/lambda_db_connection.zip")
 
-  # Add the timeout parameter (optional)
-  # timeout          = 60  # Timeout in seconds
+  # Add the timeout parameter
+  timeout = 60
 
   environment {
     variables = {
@@ -104,7 +103,6 @@ resource "aws_lambda_function" "lambda_db_connection" {
   }
 }
 
-# New Lambda Function: lambda_load_rds_glue
 resource "aws_lambda_function" "lambda_load_rds_glue" {
   function_name    = "lambda_load_rds_glue"
   role             = aws_iam_role.lambda_execution_role.arn
@@ -113,10 +111,17 @@ resource "aws_lambda_function" "lambda_load_rds_glue" {
   filename         = "${path.module}/../zipped_lambda_functions/lambda_load_rds_glue.zip"
   source_code_hash = filebase64sha256("${path.module}/../zipped_lambda_functions/lambda_load_rds_glue.zip")
 
+  # Add the timeout parameter
+  timeout = 60
+
   environment {
     variables = {
       CUSTOM_AWS_REGION = var.CUSTOM_AWS_REGION
-      # Add any additional environment variables if needed
+      DB_HOST           = var.DB_HOST
+      DB_PORT           = var.DB_PORT
+      DB_NAME           = var.DB_NAME
+      DB_USER           = var.DB_USER
+      DB_PASSWORD       = var.DB_PASSWORD
     }
   }
 
@@ -125,7 +130,6 @@ resource "aws_lambda_function" "lambda_load_rds_glue" {
   }
 }
 
-# Lambda Permission to allow S3 to invoke lambda_load_rds_glue
 resource "aws_lambda_permission" "allow_s3_invoke_lambda_load_rds_glue" {
   statement_id  = "AllowS3InvokeLambdaLoadRDSGlue"
   action        = "lambda:InvokeFunction"
