@@ -30,7 +30,6 @@ resource "aws_s3_object" "latest_dam_data_etl_script" {
   # acl    = "private"
 }
 
-# Define the Glue job
 resource "aws_glue_job" "latest_dam_data_etl" {
   name     = "latest_dam_data_etl"
   role_arn = aws_iam_role.glue_service_role.arn
@@ -50,9 +49,11 @@ resource "aws_glue_job" "latest_dam_data_etl" {
     "--DB_USER"                   = var.DB_USER
     "--DB_PASSWORD"               = var.DB_PASSWORD
     "--additional-python-modules" = "pymysql"
+    "--enable-continuous-log-filter" = "true"  # Set to "true" or "false" explicitly
+    "--enable-metrics"            = "true"  # Set to "true" or "false" explicitly
   }
 
-  glue_version      = "2.0"
+  glue_version      = "3.0"  # Updated from "2.0" to "3.0"
   max_retries       = 0
   timeout           = 10
   number_of_workers = 2
@@ -63,7 +64,6 @@ resource "aws_glue_job" "latest_dam_data_etl" {
   }
 
   # Removed the connections parameter to avoid running in a VPC
-  # connections = [aws_glue_connection.glue_rds_connection.name]
 }
 
 # Removed the Glue connection resource since we're not using a VPC
