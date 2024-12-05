@@ -164,6 +164,7 @@ resource "aws_iam_policy" "glue_s3_access_policy" {
     "Version": "2012-10-17",
     "Statement": [
       {
+        # Permissions to read from the Glue scripts bucket
         "Effect": "Allow",
         "Action": [
           "s3:GetObject",
@@ -175,6 +176,7 @@ resource "aws_iam_policy" "glue_s3_access_policy" {
         ]
       },
       {
+        # Permissions to read/write to the Glue temp bucket
         "Effect": "Allow",
         "Action": [
           "s3:PutObject",
