@@ -81,6 +81,22 @@ resource "aws_iam_policy" "lambda_execution_policy" {
           "s3:PutObject"
         ],
         "Resource": "${aws_s3_bucket.latest_dam_data_storage.arn}/*"
+      },
+      {
+        # Permissions to read from the S3 bucket
+        "Effect": "Allow",
+        "Action": [
+          "s3:GetObject"
+        ],
+        "Resource": "${aws_s3_bucket.latest_dam_data_storage.arn}/*"
+      },
+      {
+        # Permissions to list the S3 bucket (optional but recommended)
+        "Effect": "Allow",
+        "Action": [
+          "s3:ListBucket"
+        ],
+        "Resource": "${aws_s3_bucket.latest_dam_data_storage.arn}"
       }
     ]
   })
